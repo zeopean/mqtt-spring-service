@@ -1,7 +1,7 @@
 package com.mqtt.artqiyi.tasks;
 
 import com.mqtt.artqiyi.common.CacheKey;
-import com.mqtt.artqiyi.paho.ClientMQTT;
+import com.mqtt.artqiyi.paho.Client;
 import com.mqtt.artqiyi.utils.cache.RedisUtil;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +30,11 @@ public class MqttClientJob {
             // 状态重置
             cache.set(CacheKey.CK_TOPICS_FRESH, 0);
 
-            new ClientMQTT().start(true);
+            new Client().start(true);
             lock = true;
         }
         if (!lock) {
-            new ClientMQTT().start(false);
+            new Client().start(false);
         }
         lock = true;
     }

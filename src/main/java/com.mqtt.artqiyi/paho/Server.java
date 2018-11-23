@@ -18,9 +18,9 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-public class ServerMQTT {
+public class Server {
 
-    private static final String clientId = "server11";
+    private static final String serviceId = "server11";
     private MqttClient client;
     private MqttTopic topic11;
 
@@ -31,9 +31,9 @@ public class ServerMQTT {
      * 构造函数
      * @throws MqttException
      */
-    public ServerMQTT() throws MqttException {
+    public Server() throws MqttException {
         // MemoryPersistence设置clientid的保存形式，默认为以内存保存
-        client = new MqttClient(MqttProperties.MQTT_HOST, clientId, new MemoryPersistence());
+        client = new MqttClient(MqttProperties.MQTT_HOST, serviceId, new MemoryPersistence());
         connect();
     }
 

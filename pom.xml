@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>mqtt-service</name>
-    <description>奇异果 mqtt 服务端</description>
+    <description> mqtt 服务端</description>
 
 
     <repositories>

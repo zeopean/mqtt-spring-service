@@ -25,4 +25,12 @@ public class TopicTest extends BaseTests {
         boolean res = cache.set(CacheKey.CK_TOPICS, topics);
         cache.set(CacheKey.CK_TOPICS_FRESH, 1);
     }
+
+    @Test
+    public void connectCount()
+    {
+        // activateMQ 连接数
+        int count = 0;
+
+    }
 }

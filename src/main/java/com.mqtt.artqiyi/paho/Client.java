@@ -10,6 +10,7 @@ package com.mqtt.artqiyi.paho;
 
 import com.mqtt.artqiyi.common.CacheKey;
 import com.mqtt.artqiyi.config.MqttProperties;
+import com.mqtt.artqiyi.utils.cache.CacheExpiredUtil;
 import com.mqtt.artqiyi.utils.cache.RedisUtil;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -19,17 +20,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ClientMQTT {
+public class Client {
 
     @Autowired
     private static RedisUtil cache;
 
     @Autowired
     public void setCache(RedisUtil cache) {
-        ClientMQTT.cache = cache;
+        Client.cache = cache;
     }
 
-    private static final String clientId = "client1";
     private static MqttClient client;
     private static MqttConnectOptions options;
 
@@ -54,7 +54,7 @@ public class ClientMQTT {
         try {
             if (null == client) {
                 // host为主机名，clientid即连接MQTT的客户端ID，一般以唯一标识符表示，MemoryPersistence设置clientid的保存形式，默认为以内存保存
-                client = new MqttClient(MqttProperties.MQTT_HOST, clientId, new MemoryPersistence());
+                client = new MqttClient(MqttProperties.MQTT_HOST, MqttProperties.MQTT_CLIENTID, new MemoryPersistence());
                 client.setCallback(new PushCallback());
             }
             if (client.isConnected()) {
@@ -69,10 +69,32 @@ public class ClientMQTT {
             //订阅消息
             String[] topic = cache.get(CacheKey.CK_TOPICS, String[].class);
             client.subscribe(topic);
+//            subsrube(client, topic);
 
         } catch (MqttException e) {
             e.printStackTrace();
         }
+    }
+
+    private void subsrube(MqttClient client, String[] topics) {
+        if (null == topics) {
+            return;
+        }
+        String cacheKey;
+        try {
+            for (String topic : topics) {
+                // 判断是否已经发布信息，必须保证使用的是同一个 redis 服务器
+                cacheKey = String.format(CacheKey.CK_TOPIC_IS_SUBSCRIBE, topic);
+                if (!cache.exists(cacheKey)) {
+                    cache.set(cacheKey, 1, CacheExpiredUtil.getSecond(3));
+                    client.subscribe(topic);
+                }
+                cache.remove(cacheKey);
+            }
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
